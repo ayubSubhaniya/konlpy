@@ -4,8 +4,11 @@ from __future__ import absolute_import
 import logging
 import os
 import sys
+
 try:
     import jpype
+
+    jpype.attachThreadToJVM()
 except ImportError:
     pass
 
@@ -55,14 +58,14 @@ def init_jvm(jvmpath=None, max_heap_size=1024):
     jvmpath = jvmpath or jpype.getDefaultJVMPath()
 
     # NOTE: Temporary patch for Issue #76. Erase when possible.
-    if sys.platform == 'darwin'\
-            and jvmpath.find('1.8.0') > 0\
+    if sys.platform == 'darwin' \
+            and jvmpath.find('1.8.0') > 0 \
             and jvmpath.endswith('libjvm.dylib'):
         jvmpath = '%s/lib/jli/libjli.dylib' % jvmpath.split('/lib/')[0]
 
     if jvmpath:
         jpype.startJVM(jvmpath, '-Djava.class.path=%s' % classpath,
-                                '-Dfile.encoding=UTF8',
-                                '-ea', '-Xmx{}m'.format(max_heap_size))
+                       '-Dfile.encoding=UTF8',
+                       '-ea', '-Xmx{}m'.format(max_heap_size))
     else:
         raise ValueError("Please specify the JVM path.")
